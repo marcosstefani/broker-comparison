@@ -2,6 +2,7 @@ import time
 import sys
 import pika
 from config import MESSAGE_COUNT, TOPIC_NAME
+from report import save_result
 
 count = 0
 start_time = None
@@ -19,7 +20,9 @@ def callback(ch, method, properties, body):
 
     if count >= MESSAGE_COUNT:
         end_time = time.time()
-        print(f"\nRabbitMQ Consumer: {MESSAGE_COUNT} messages in {end_time - start_time:.4f} seconds")
+        duration = end_time - start_time
+        print(f"\nRabbitMQ Consumer: {MESSAGE_COUNT} messages in {duration:.4f} seconds")
+        save_result("RabbitMQ", "Consumer", MESSAGE_COUNT, duration)
         ch.stop_consuming()
 
 def run():

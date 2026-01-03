@@ -1,6 +1,7 @@
 import time
 from pulse import Producer
 from config import MESSAGE_COUNT, TOPIC_NAME, PAYLOAD
+from report import save_result
 
 def run():
     # Assuming localhost defaults work as per README
@@ -18,7 +19,9 @@ def run():
     producer.close()
     
     end = time.time()
-    print(f"\nPulse Producer: {MESSAGE_COUNT} messages in {end - start:.4f} seconds")
+    duration = end - start
+    print(f"\nPulse Producer: {MESSAGE_COUNT} messages in {duration:.4f} seconds")
+    save_result("Pulse", "Producer", MESSAGE_COUNT, duration)
 
 if __name__ == "__main__":
     run()

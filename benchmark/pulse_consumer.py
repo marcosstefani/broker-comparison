@@ -3,6 +3,7 @@ import sys
 import os
 from pulse import consumer, run
 from config import MESSAGE_COUNT, TOPIC_NAME
+from report import save_result
 
 count = 0
 start_time = None
@@ -20,7 +21,9 @@ def handle(msg):
 
     if count >= MESSAGE_COUNT:
         end_time = time.time()
-        print(f"\nPulse Consumer: {MESSAGE_COUNT} messages in {end_time - start_time:.4f} seconds")
+        duration = end_time - start_time
+        print(f"\nPulse Consumer: {MESSAGE_COUNT} messages in {duration:.4f} seconds")
+        save_result("Pulse", "Consumer", MESSAGE_COUNT, duration)
         # Force exit the process immediately, ensuring main thread also stops
         os._exit(0)
 

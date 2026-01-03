@@ -56,6 +56,15 @@ jobs:
         # RabbitMQ queues persist if declared. Producer declares queue.
         python -u benchmark/rabbitmq_producer.py
         python -u benchmark/rabbitmq_consumer.py
+
+    - name: Generate Summary
+      if: always()
+      run: |
+        python benchmark/generate_summary.py >> $GITHUB_STEP_SUMMARY
+        
+    - name: Stop Brokers
+      if: always()
+      run: docker compose down
         
     - name: Stop Brokers
       if: always()

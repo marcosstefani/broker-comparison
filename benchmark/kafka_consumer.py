@@ -2,6 +2,7 @@ import time
 import sys
 from confluent_kafka import Consumer, KafkaError
 from config import MESSAGE_COUNT, TOPIC_NAME
+from report import save_result
 
 def run():
     conf = {
@@ -55,7 +56,9 @@ def run():
 
             if count >= MESSAGE_COUNT:
                 end_time = time.time()
-                print(f"\nKafka Consumer: {MESSAGE_COUNT} messages in {end_time - start_time:.4f} seconds")
+                duration = end_time - start_time
+                print(f"\nKafka Consumer: {MESSAGE_COUNT} messages in {duration:.4f} seconds")
+                save_result("Kafka", "Consumer", MESSAGE_COUNT, duration)
                 break
 
             msg = consumer.poll(1.0)

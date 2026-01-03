@@ -2,6 +2,7 @@ import time
 import pika
 import json
 from config import MESSAGE_COUNT, TOPIC_NAME, PAYLOAD
+from report import save_result
 
 def run():
     connection = pika.BlockingConnection(
@@ -23,7 +24,9 @@ def run():
 
     connection.close()
     end = time.time()
-    print(f"\nRabbitMQ Producer: {MESSAGE_COUNT} messages in {end - start:.4f} seconds")
+    duration = end - start
+    print(f"\nRabbitMQ Producer: {MESSAGE_COUNT} messages in {duration:.4f} seconds")
+    save_result("RabbitMQ", "Producer", MESSAGE_COUNT, duration)
 
 if __name__ == "__main__":
     run()
