@@ -37,29 +37,25 @@ jobs:
     - name: Benchmark Pulse
       run: |
         echo "Starting Pulse Benchmark with $MESSAGE_COUNT messages..."
-        python -u benchmark/pulse_consumer.py &
-        CONSUMER_PID=$!
-        sleep 2
+        # Pulse persists messages, so we can produce first then consume
         python -u benchmark/pulse_producer.py
-        wait $CONSUMER_PID
+        python -u benchmark/pulse_consumer.py
         
     - name: Benchmark Kafka
       run: |
         echo "Starting Kafka Benchmark with $MESSAGE_COUNT messages..."
-        python -u benchmark/kafka_consumer.py &
-        CONSUMER_PID=$!
-        sleep 10 # Kafka consumer might take a bit longer to join group/assign partitions
+        # Kafka persists messages, so we can produce first then consume
         python -u benchmark/kafka_producer.py
-        wait $CONSUMER_PID
+        # Give a small buffer for consumer group coordination if needed, though not strictly necessary for simple consumption
+        sleep 2 
+        python -u benchmark/kafka_consumer.py
 
     - name: Benchmark RabbitMQ
       run: |
         echo "Starting RabbitMQ Benchmark with $MESSAGE_COUNT messages..."
-        python -u benchmark/rabbitmq_consumer.py &
-        CONSUMER_PID=$!
-        sleep 2
+        # RabbitMQ queues persist if declared. Producer declares queue.
         python -u benchmark/rabbitmq_producer.py
-        wait $CONSUMER_PID
+        python -u benchmark/rabbitmq_consumer.py
         
     - name: Stop Brokers
       if: always()

@@ -18,10 +18,47 @@ def run():
     
     print(f"Kafka Consumer: Waiting for {MESSAGE_COUNT} messages...")
 
+    # Wait for topic/messages to be available
+    retries = 10
+    while retries > 0:
+        msg = consumer.poll(1.0)
+        if msg is None:
+            retries -= 1
+            continue
+        if msg.error():
+            if msg.error().code() == KafkaError._PARTITION_EOF:
+                continue
+            else:
+                # Ignore initial errors like unknown topic while it's being created/propagated
+                print(f"Kafka Warning: {msg.error()}")
+                continue
+        
+        # If we got here, we have a valid message
+        if count == 0:
+            start_time = time.time()
+            print("Kafka Consumer: First message received.")
+        
+        count += 1
+        break # Exit retry loop and enter main loop
+
+    if count == 0:
+        print("Kafka Consumer: No messages received after retries.")
+        return
+
     try:
         while True:
-            msg = consumer.poll(1.0)
+            # We already have one message if we broke the loop above, but let's simplify logic
+            # by just continuing the loop. Wait, we consumed one.
+            
+            if count % 1000 == 0:
+                print(f"Consumed {count} messages", end='\r')
 
+            if count >= MESSAGE_COUNT:
+                end_time = time.time()
+                print(f"\nKafka Consumer: {MESSAGE_COUNT} messages in {end_time - start_time:.4f} seconds")
+                break
+
+            msg = consumer.poll(1.0)
             if msg is None:
                 continue
             if msg.error():
@@ -30,19 +67,8 @@ def run():
                 else:
                     print(msg.error())
                     break
-
-            if count == 0:
-                start_time = time.time()
-                print("Kafka Consumer: First message received.")
-
+            
             count += 1
-            if count % 1000 == 0:
-                print(f"Consumed {count} messages", end='\r')
-
-            if count >= MESSAGE_COUNT:
-                end_time = time.time()
-                print(f"\nKafka Consumer: {MESSAGE_COUNT} messages in {end_time - start_time:.4f} seconds")
-                break
     finally:
         consumer.close()
 
