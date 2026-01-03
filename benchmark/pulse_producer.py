@@ -1,5 +1,4 @@
 import time
-import concurrent.futures
 from pulse import Producer
 from config import MESSAGE_COUNT, TOPIC_NAME, PAYLOAD
 from report import save_result
@@ -11,18 +10,14 @@ def run():
     
     start = time.time()
     
-    # Use a thread pool to simulate async/concurrent production
-    # This helps saturate the broker better than a single synchronous thread
-    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
-        futures = []
+    # Use streaming publish for high throughput
+    def message_generator():
         for i in range(MESSAGE_COUNT):
-            futures.append(executor.submit(producer.send, TOPIC_NAME, PAYLOAD))
-            
             if i % 1000 == 0:
-                print(f"Scheduled {i} messages", end='\r')
-        
-        # Wait for all to complete
-        concurrent.futures.wait(futures)
+                print(f"Generating {i} messages", end='\r')
+            yield (TOPIC_NAME, PAYLOAD)
+
+    producer.stream_send(message_generator())
 
     producer.close()
     
