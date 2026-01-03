@@ -1,4 +1,5 @@
 import time
+import concurrent.futures
 from pulse import Producer
 from config import MESSAGE_COUNT, TOPIC_NAME, PAYLOAD
 from report import save_result
@@ -7,15 +8,22 @@ def run():
     # Assuming localhost defaults work as per README
     producer = Producer() 
     print(f"Pulse Producer: Starting to produce {MESSAGE_COUNT} messages...")
-    start = time.time()
-    for i in range(MESSAGE_COUNT):
-        producer.send(TOPIC_NAME, PAYLOAD)
-        if i % 1000 == 0:
-            print(f"Produced {i} messages", end='\r')
     
-    # Ensure all messages are sent (if async) - Pulse seems sync or fast enough, 
-    # but if there's a flush, we should use it. README didn't mention flush.
-    # producer.close() might flush.
+    start = time.time()
+    
+    # Use a thread pool to simulate async/concurrent production
+    # This helps saturate the broker better than a single synchronous thread
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        futures = []
+        for i in range(MESSAGE_COUNT):
+            futures.append(executor.submit(producer.send, TOPIC_NAME, PAYLOAD))
+            
+            if i % 1000 == 0:
+                print(f"Scheduled {i} messages", end='\r')
+        
+        # Wait for all to complete
+        concurrent.futures.wait(futures)
+
     producer.close()
     
     end = time.time()
