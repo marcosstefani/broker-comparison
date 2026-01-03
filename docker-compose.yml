@@ -6,6 +6,8 @@ services:
     ports:
       - "5555:5555" # HTTP Port
       - "5556:5556" # gRPC Port
+    volumes:
+      - ./pulse.yml:/app/pulse.yml
     restart: always
 
   # RabbitMQ
