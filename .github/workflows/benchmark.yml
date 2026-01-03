@@ -37,28 +37,28 @@ jobs:
     - name: Benchmark Pulse
       run: |
         echo "Starting Pulse Benchmark with $MESSAGE_COUNT messages..."
-        python benchmark/pulse_consumer.py &
+        python -u benchmark/pulse_consumer.py &
         CONSUMER_PID=$!
         sleep 2
-        python benchmark/pulse_producer.py
+        python -u benchmark/pulse_producer.py
         wait $CONSUMER_PID
         
     - name: Benchmark Kafka
       run: |
         echo "Starting Kafka Benchmark with $MESSAGE_COUNT messages..."
-        python benchmark/kafka_consumer.py &
+        python -u benchmark/kafka_consumer.py &
         CONSUMER_PID=$!
-        sleep 5 # Kafka consumer might take a bit longer to join group/assign partitions
-        python benchmark/kafka_producer.py
+        sleep 10 # Kafka consumer might take a bit longer to join group/assign partitions
+        python -u benchmark/kafka_producer.py
         wait $CONSUMER_PID
 
     - name: Benchmark RabbitMQ
       run: |
         echo "Starting RabbitMQ Benchmark with $MESSAGE_COUNT messages..."
-        python benchmark/rabbitmq_consumer.py &
+        python -u benchmark/rabbitmq_consumer.py &
         CONSUMER_PID=$!
         sleep 2
-        python benchmark/rabbitmq_producer.py
+        python -u benchmark/rabbitmq_producer.py
         wait $CONSUMER_PID
         
     - name: Stop Brokers
