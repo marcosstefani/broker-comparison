@@ -15,8 +15,10 @@ def callback(ch, method, properties, body):
         print("RabbitMQ Consumer: First message received.")
     
     count += 1
-    if count % 1000 == 0:
-        print(f"Consumed {count} messages", end='\r')
+    if count % 100000 == 0:
+        current_duration = time.time() - start_time
+        print(f"RabbitMQ Consumer: Reached {count} messages in {current_duration:.4f}s")
+        save_result("RabbitMQ", "Consumer", count, current_duration)
 
     if count >= MESSAGE_COUNT:
         end_time = time.time()

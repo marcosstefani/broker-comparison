@@ -1,7 +1,7 @@
 import json
 import os
 
-RESULTS_FILE = "benchmark_results.json"
+RESULTS_FILE = "benchmark_results.jsonl"
 
 def save_result(broker, role, messages, duration):
     result = {
@@ -12,15 +12,5 @@ def save_result(broker, role, messages, duration):
         "throughput": messages / duration if duration > 0 else 0
     }
     
-    data = []
-    if os.path.exists(RESULTS_FILE):
-        try:
-            with open(RESULTS_FILE, 'r') as f:
-                data = json.load(f)
-        except:
-            pass
-    
-    data.append(result)
-    
-    with open(RESULTS_FILE, 'w') as f:
-        json.dump(data, f, indent=2)
+    with open(RESULTS_FILE, 'a') as f:
+        f.write(json.dumps(result) + "\n")

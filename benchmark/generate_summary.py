@@ -1,15 +1,18 @@
 import json
 import os
 
-RESULTS_FILE = "benchmark_results.json"
+RESULTS_FILE = "benchmark_results.jsonl"
 
 def generate():
     if not os.path.exists(RESULTS_FILE):
         print("No results found.")
         return
 
+    data = []
     with open(RESULTS_FILE, 'r') as f:
-        data = json.load(f)
+        for line in f:
+            if line.strip():
+                data.append(json.loads(line))
 
     print("### Benchmark Results")
     print("| Broker | Role | Messages | Duration (s) | Throughput (msg/s) |")

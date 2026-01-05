@@ -17,10 +17,12 @@ def run():
     
     payload_bytes = json.dumps(PAYLOAD).encode('utf-8')
 
-    for i in range(MESSAGE_COUNT):
+    for i in range(1, MESSAGE_COUNT + 1):
         channel.basic_publish(exchange='', routing_key=TOPIC_NAME, body=payload_bytes)
-        if i % 1000 == 0:
-            print(f"Produced {i} messages", end='\r')
+        if i % 100000 == 0:
+            current_duration = time.time() - start
+            print(f"RabbitMQ Producer: Reached {i} messages in {current_duration:.4f}s")
+            save_result("RabbitMQ", "Producer", i, current_duration)
 
     connection.close()
     end = time.time()

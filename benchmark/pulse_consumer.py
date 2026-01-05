@@ -22,7 +22,10 @@ def handle(msg):
     # Commit every 1000 messages to reduce network overhead
     if count % 1000 == 0:
         commit()
-        print(f"Consumed {count} messages", end='\r')
+        if count % 100000 == 0:
+            current_duration = time.time() - start_time
+            print(f"Pulse Consumer: Reached {count} messages in {current_duration:.4f}s")
+            save_result("Pulse", "Consumer", count, current_duration)
 
     if count >= MESSAGE_COUNT:
         # Final commit

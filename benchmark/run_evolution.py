@@ -4,7 +4,7 @@ import subprocess
 import time
 import json
 
-RESULTS_FILE = "benchmark_results.json"
+RESULTS_FILE = "benchmark_results.jsonl"
 
 def clear_results():
     if os.path.exists(RESULTS_FILE):
@@ -42,8 +42,11 @@ def generate_summary():
         print("No results found.")
         return
 
+    data = []
     with open(RESULTS_FILE, 'r') as f:
-        data = json.load(f)
+        for line in f:
+            if line.strip():
+                data.append(json.loads(line))
 
     # Organize data
     # Structure: { "Broker Role": { "x": [msg_counts], "y": [durations] } }
@@ -82,10 +85,9 @@ def generate_summary():
 def main():
     clear_results()
     
-    # 100k to 1M, step 100k
-    for count in range(100000, 1100000, 100000):
-        run_benchmark(count)
-        time.sleep(1) # Cool down
+    # Run once for 1M messages
+    # The producers/consumers will log checkpoints every 100k
+    run_benchmark(1000000)
 
     generate_summary()
 
