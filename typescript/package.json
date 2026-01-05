@@ -1,0 +1,17 @@
+{
+  "name": "pulse-benchmark-ts",
+  "version": "1.0.0",
+  "description": "Pulse SDK Benchmark in TypeScript",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "pulse-sdk": "*",
+    "amqplib": "^0.10.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/amqplib": "^0.10.1",
+    "typescript": "^5.0.0"
+  }
+}

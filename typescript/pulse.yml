@@ -1,0 +1,15 @@
+# Connection Settings
+broker:
+  host: "localhost"
+  http_port: 5555
+  grpc_port: 5556
+  timeout_ms: 5000
+
+# Topic Configuration
+topics:
+  - name: "benchmark_test"
+    create_if_missing: true
+    config:
+      fifo: false
+    consume:
+      auto_commit: true
