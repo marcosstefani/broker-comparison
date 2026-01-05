@@ -62,24 +62,60 @@ def generate_summary():
     # Sort data points by message count and get common X axis
     x_values = sorted(list(set(d["messages"] for d in data)))
     
-    # Ensure all series have values for all x_values (fill with 0 or None if missing, though our loop ensures they exist)
-    # For Mermaid, we need aligned lists.
+    # Generate Markdown Table
+    print("\n### Evolution Benchmark Data")
+    print("| Messages | Pulse Producer (s) | Pulse Consumer (s) | RabbitMQ Producer (s) | RabbitMQ Consumer (s) |")
+    print("|---|---|---|---|---|")
     
-    print("\n### Evolution Benchmark Results")
+    # Helper to get duration
+    def get_duration(broker, role, msg_count):
+        for row in data:
+            if row['broker'] == broker and row['role'] == role and row['messages'] == msg_count:
+                return f"{row['duration']:.4f}"
+        return "-"
+
+    for x in x_values:
+        pp = get_duration("Pulse", "Producer", x)
+        pc = get_duration("Pulse", "Consumer", x)
+        rp = get_duration("RabbitMQ", "Producer", x)
+        rc = get_duration("RabbitMQ", "Consumer", x)
+        print(f"| {x} | {pp} | {pc} | {rp} | {rc} |")
+
+    # Generate Mermaid Charts
+    # Chart 1: Producers
+    print("\n### Producers Evolution")
+    print("**Line 1:** Pulse Producer | **Line 2:** RabbitMQ Producer")
     print("```mermaid")
     print("xychart-beta")
-    print("    title \"Duration Evolution (Lower is Better)\"")
+    print("    title \"Producers Duration (Lower is Better)\"")
     print(f"    x-axis {json.dumps([str(x) for x in x_values])}")
     print("    y-axis \"Duration (s)\"")
     
-    for key, values in series.items():
-        # Sort values based on x_values to ensure alignment
-        # Create a map of msg_count -> duration
-        val_map = dict(zip(values["x"], values["y"]))
-        aligned_y = [round(val_map.get(x, 0), 2) for x in x_values]
-        
-        print(f"    line {json.dumps(aligned_y)} \"{key}\"")
-        
+    # Pulse Producer
+    pp_data = [round(float(get_duration("Pulse", "Producer", x)), 2) for x in x_values]
+    print(f"    line {json.dumps(pp_data)}")
+    
+    # RabbitMQ Producer
+    rp_data = [round(float(get_duration("RabbitMQ", "Producer", x)), 2) for x in x_values]
+    print(f"    line {json.dumps(rp_data)}")
+    print("```")
+
+    # Chart 2: Consumers
+    print("\n### Consumers Evolution")
+    print("**Line 1:** Pulse Consumer | **Line 2:** RabbitMQ Consumer")
+    print("```mermaid")
+    print("xychart-beta")
+    print("    title \"Consumers Duration (Lower is Better)\"")
+    print(f"    x-axis {json.dumps([str(x) for x in x_values])}")
+    print("    y-axis \"Duration (s)\"")
+    
+    # Pulse Consumer
+    pc_data = [round(float(get_duration("Pulse", "Consumer", x)), 2) for x in x_values]
+    print(f"    line {json.dumps(pc_data)}")
+    
+    # RabbitMQ Consumer
+    rc_data = [round(float(get_duration("RabbitMQ", "Consumer", x)), 2) for x in x_values]
+    print(f"    line {json.dumps(rc_data)}")
     print("```")
 
 def main():
