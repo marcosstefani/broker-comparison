@@ -62,8 +62,11 @@ def generate_summary():
     # Sort data points by message count and get common X axis
     x_values = sorted(list(set(d["messages"] for d in data)))
     
+    # Clear screen
+    os.system('cls' if os.name == 'nt' else 'clear')
+
     # Generate Markdown Table
-    print("\n### Evolution Benchmark Data")
+    print("### Evolution Benchmark Data")
     print("| Messages | Pulse Producer (s) | Pulse Consumer (s) | RabbitMQ Producer (s) | RabbitMQ Consumer (s) |")
     print("|---|---|---|---|---|")
     
