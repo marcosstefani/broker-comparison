@@ -40,15 +40,6 @@ jobs:
         # Pulse persists messages, so we can produce first then consume
         python -u benchmark/pulse_producer.py
         python -u benchmark/pulse_consumer.py
-        
-    - name: Benchmark Kafka
-      run: |
-        echo "Starting Kafka Benchmark with $MESSAGE_COUNT messages..."
-        # Kafka persists messages, so we can produce first then consume
-        python -u benchmark/kafka_producer.py
-        # Give a small buffer for consumer group coordination if needed, though not strictly necessary for simple consumption
-        sleep 2 
-        python -u benchmark/kafka_consumer.py
 
     - name: Benchmark RabbitMQ
       run: |
